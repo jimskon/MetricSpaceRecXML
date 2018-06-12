@@ -2,6 +2,8 @@
 #include <string>
 #include <iostream>
 #include <vector>
+#include <iterator>
+#include <sstream>
 #include <math.h> 
 #include <map>
 #include <algorithm>
@@ -19,6 +21,21 @@ int max(int a, int b) {
         return a;
     else
         return b;
+}
+
+string sigToString(vector<int> signature) {   
+    std::ostringstream vss;
+    
+    if (!signature.empty()) 
+    {
+    // Convert all but the last element to avoid a trailing ","
+    std::copy(signature.begin(), signature.end()-1, std::ostream_iterator<int>(vss, ","));
+
+    // Now add the last element with no delimiter
+    vss << signature.back();
+    }
+    
+    return vss.str();
 }
 
 Point computeP2(Point pStart, Point pEnd) {
@@ -57,7 +74,6 @@ void clearDists(Graph *g) {
 
 // Recursively set the distances of all nodes adjacent to this node
 // as long as distance <= MAX
-
 void getNodesInRange(Graph *g, set<int> &inRange, int index, int max) {
     int dist = g->at(index)->getDist(); // Distance of this node
     //cout << "Node: " << index << " Dist: " << dist << endl;
@@ -75,7 +91,6 @@ void getNodesInRange(Graph *g, set<int> &inRange, int index, int max) {
 }
 
 // Find all nodes within max range
-
 set<int> findNodesInRange(Graph *g, int startIndex, int max) {
     set<int> ball; // Nodes in ball of max diameter
     clearDists(g); // reset distances
@@ -121,10 +136,10 @@ void removeUsedColors(Graph *g, set<int> &colors, set<int> ball) {
         if (color > 0) {
             colors.erase(color);
         }
-    }
-    
+    } 
 }
 void colorAllNodes(Graph *g, int maxDist) {
+    
     const int MaxColors = 65;
     set<int> colors; //set of currently available colors
     set<int>::iterator it;
@@ -142,55 +157,6 @@ void colorAllNodes(Graph *g, int maxDist) {
     }
 }
 
-// Create nested levels between n1 and n2, pushing on g
-// return the graph index of first element in the group
-// If skipFirst is true, don't add first element (ni)
-
-void createGroup(Node *n1, Node *n6, int level, Graph *g, int &si, int &fi) {
-
-    if (level == 0) {
-        if (si < 0) {
-            si = g->add(n1);
-        }
-        if (fi < 0) {
-            fi = g->add(n6);
-        }
-
-        g->addLink(si, fi);
-
-        return;
-    }
-
-    Node *n2 = new Node(computeP2(n1->getPoint(), n6->getPoint()));
-    Node *n3 = new Node(computeP3(n1->getPoint(), n6->getPoint()));
-    Node *n4 = new Node(computeP4(n1->getPoint(), n6->getPoint()));
-    Node *n5 = new Node(computeP5(n1->getPoint(), n6->getPoint()));
-    int b = -1, c = -1, d = -1, e = -1;
-    createGroup(n1, n2, level - 1, g, si, b);
-    createGroup(n2, n3, level - 1, g, b, c);
-    createGroup(n2, n4, level - 1, g, b, d);
-    createGroup(n3, n5, level - 1, g, c, e);
-    createGroup(n4, n5, level - 1, g, d, e);
-    createGroup(n5, n6, level - 1, g, e, fi);
-
-}
-
-void createMetricSpace(Node *n1, Node *n2, int l, Graph *g) {
-
-    if (l < 1) {
-        cout << "Levels must be at least one" << endl;
-
-        return;
-    }
-
-    // create all levels (points) between these nodes
-    // point first to the first point in created group
-    int si = -1;
-    int fi = -1;
-    createGroup(n1, n2, l - 1, g, si, fi);
-    //cout << si << ":" << fi << endl;    
-}
-
 void displayBall(Graph *g, set<int> ball) {
     cout << "Size of ball: " << ball.size() << endl;
     set<int>::iterator it;
@@ -200,8 +166,88 @@ void displayBall(Graph *g, set<int> ball) {
     cout << '\n';
 }
 
-// Create 
+// Creates all of the nodes, links, and signatures.
+void createGroup(Node *n1, Node *n6, int level, int sigLen, Graph *g, int &si, int &fi) {    
+    // Links the nodes
+    if (level == 0) {  
+        if (si < 0) {
+            si = g->add(n1);
+        }
+        if (fi < 0) {
+            fi = g->add(n6);
+        }
+        g->addLink(si, fi);
+        return;
+    }
+    
+    // Creates four new nodes that are between the end points.
+    Node *n2 = new Node(computeP2(n1->getPoint(), n6->getPoint()));
+    Node *n3 = new Node(computeP3(n1->getPoint(), n6->getPoint()));
+    Node *n4 = new Node(computeP4(n1->getPoint(), n6->getPoint()));
+    Node *n5 = new Node(computeP5(n1->getPoint(), n6->getPoint()));
+    
+    // Creates the signature for the nodes.
+    vector<int> ts = n1->getSig();
+    
+    while (ts.size() >= sigLen) {
+        ts.pop_back();
+    }
+    
+    if (n6->getSig().back() == -2) {
+        ts.pop_back();
+        ts.push_back(-1);
+    }
+    
+    if (n1->size() < sigLen) {
+        n1->pushSig(0);
+    }
+        
+    if (n6->size() < sigLen) {
+        n6->pushSig(0);
+    }
+        
+    n2->copySig(ts);
+    n3->copySig(ts);
+    n4->copySig(ts);
+    n5->copySig(ts);
+    
+    n2->pushSig(1);
+    n3->pushSig(2);
+    n4->pushSig(-2);
+    n5->pushSig(3);
+    
+    int b = -1, c = -1, d = -1, e = -1;
+    
+    // Repeat the process until all nodes are accounted for.
+    createGroup(n1, n2, level - 1, sigLen+1, g, si, b);
+    createGroup(n2, n3, level - 1, sigLen+1, g, b, c);
+    createGroup(n2, n4, level - 1, sigLen+1, g, b, d);
+    createGroup(n3, n5, level - 1, sigLen+1, g, c, e);
+    createGroup(n4, n5, level - 1, sigLen+1, g, d, e);
+    createGroup(n5, n6, level - 1, sigLen+1, g, e, fi);
+    
+}
 
+// Create all levels (and nodes) between these two nodes. Point first to the 
+// first point in the created group.
+void createMetricSpace(Node *n1, Node *n2, int l, Graph *g) {
+    
+    if (l < 1) {
+        cout << "Levels must be at least one" << endl;
+        return;
+    }
+    
+    int si = -1;
+    int fi = -1;
+    
+    n1->pushSig(0);
+    n2->pushSig(1);
+    
+    createGroup(n1, n2, l - 1, 2, g, si, fi);
+    
+}
+
+// Create 
 int main() {
     Graph *g = new Graph();
     int levels;
@@ -212,21 +258,25 @@ int main() {
     Node *n1 = new Node(pStart);
     Node *n2 = new Node(pEnd);
 
-    cout << "How many levels?";
+    cout << "How many levels? ";
     cin >> levels;
 
     createMetricSpace(n1, n2, levels, g);
-    cout << "Done creating, size:" << g->size() << endl;
+    //cout << "Done creating, size: " << g->size() << endl;
 
     //g->xmlNodes();
+    
     int node = 1;
     int size;
+    
     //colorBallsWithBallSize(g, 64);
+    
     colorAllNodes(g,10);
     g->xmlNodes();
-    cout << "Highest Color: " << maxColorsUsed << endl;
+    
+    cout << endl << "Highest Color: " << maxColorsUsed << endl;
+    
     //g->display();
 
     return 0;
 }
-
