@@ -5,8 +5,8 @@ using namespace std;
               //INITIALIZES
 Point::Point():xCOORD(0), yCOORD(0)
 {
-   //default constructor
-   //does nothing
+   //Default constructor.
+   //Does nothing.
 }
 
 //Constructor acts as a mutator
