@@ -166,6 +166,10 @@ void displayBall(Graph *g, set<int> ball) {
     cout << '\n';
 }
 
+int getNeg(int v) {
+    return (-1)*v;
+}
+
 // Creates all of the nodes, links, and signatures.
 void createGroup(Node *n1, Node *n6, int level, int sigLen, Graph *g, int &si, int &fi) {    
     // Links the nodes
@@ -193,9 +197,14 @@ void createGroup(Node *n1, Node *n6, int level, int sigLen, Graph *g, int &si, i
         ts.pop_back();
     }
     
-    if (n6->getSig().back() == -2) {
-        ts.pop_back();
-        ts.push_back(-1);
+    // Assigns (-1) to the point in the signature that should be going down.
+    int j=0;
+    while(j < ts.size()) {
+        if ( (n6->getSig().at(j) < 0 && ts.at(j) > 0)) {
+            ts.at(j) = -1;
+            break;
+        } 
+        j++;   
     }
     
     if (n1->size() < sigLen) {
@@ -262,7 +271,7 @@ int main() {
     cin >> levels;
 
     createMetricSpace(n1, n2, levels, g);
-    //cout << "Done creating, size: " << g->size() << endl;
+    cout << "Done creating, size: " << g->size() << endl;
 
     //g->xmlNodes();
     
