@@ -41,6 +41,10 @@
         <rebuildPropChanged>false</rebuildPropChanged>
       </toolsSet>
       <compileType>
+        <ccTool>
+          <standard>11</standard>
+          <commandlineTool>g++</commandlineTool>
+        </ccTool>
         <linkerTool>
           <linkerDynSerch>
             <pElem>.</pElem>

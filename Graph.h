@@ -19,7 +19,7 @@ public:
     int size();
     Node *at(int i);
     void display();
-    void xmlNodes();
+    void xmlNodes();    
 private:
     vector<Node*> graph;
 };

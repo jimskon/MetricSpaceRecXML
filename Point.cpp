@@ -11,7 +11,6 @@ Point::Point():xCOORD(0), yCOORD(0)
 
 //Constructor acts as a mutator
 //to get values
-
 Point::Point(double new_x, double new_y)
 {
     xCOORD = new_x;

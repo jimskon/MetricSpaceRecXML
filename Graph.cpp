@@ -12,8 +12,6 @@
 #include "Node.h"
 #include "Graph.h"
 
-
-
 Graph::Graph() {
 }
 
@@ -49,11 +47,17 @@ void Graph::display() {
 }
 
 void Graph::xmlNodes() {
-    int len = graph.size();
-    cout << "<nodes>";
-    for (int i = 0; i < len; i++) {
-        cout << "<n>";
+    int k =1;
+    int length = graph.size();
+    //cout << "<nodes>";
+    for (int i = 0; i < length; i++) {
+        //cout << "<n>";
+        cout << "No. " << k << " | "; 
+        
         graph.at(i)->xmlNodeXY();
+        
+        cout << " | ";
+        
         vector<int> neighbors = graph.at(i)->getNeighbors();
         int l = neighbors.size();
         for (int i=0; i<l; i++){
@@ -62,17 +66,25 @@ void Graph::xmlNodes() {
             cout << "</l>";
         }
         
-        cout << "<c>";
-        int color = graph.at(i)->getColor();
-        cout << color;
-        cout << "</c>";
-        cout << "</n>";
+        //cout << " | ";
         
-        cout << "<s>";
-        string signature = graph.at(i)->retreiveSig();
-        cout << signature;
-        cout << "</s>";
-        cout << "</n>";
+        //cout << "<c>";
+        //int color = graph.at(i)->getColor();
+        cout << color;
+        //cout << "</c>";
+        
+        cout << " | ";
+        
+        //cout << "<s>";
+        //string signature = graph.at(i)->vecToString();
+        string signature = graph.at(i)->listToString();
+        //cout << signature;
+        //cout << "</s>";
+        //cout << "</n>";
+                
+        cout << signature << endl;
+        k++;
+        
     }
-    cout << "</nodes>";
+    //cout << "</nodes>";
 }

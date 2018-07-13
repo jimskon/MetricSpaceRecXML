@@ -12,10 +12,12 @@
 #include <sstream>
 #include <iterator>
 #include <iostream>
+#include <list>
 #include <math.h> 
 #include <map>
 #include <limits>
 #include "Node.h"
+
 
 Node::Node() {
     color = 0;
@@ -26,9 +28,22 @@ Node::Node(Point p) {
     this->p = p;
 }
 
-//Node::Node(const Node& orig) {
-//   (*this) = orig;
-//}
+Node::Node(int c, int n[], int s[], Point p) {
+    color = c;
+    int i=0;
+    
+    while (n[i] < INT_MAX) {
+        neighbors.push_back(n[i++]);
+    }
+    
+    i = 0;
+    while (s[i] < INT_MAX) {
+        sigLis.push_back(s[i++]);
+        //signature.push_back(s[i++]);
+    }
+        
+    this->p = p;
+}
 
 Node::~Node() {
 }
@@ -86,7 +101,7 @@ int Node::getColor() {
 }
 
 // Converts a vector into a string.
-string Node::retreiveSig() {
+string Node::vecToString() {
     std::ostringstream vss;
     
     if (!signature.empty()) {
@@ -125,4 +140,45 @@ void Node::copySig(vector<int> v) {
 // Return the size of the signature.
 int Node::size() {
     return signature.size();
+}
+
+void Node::vecToList() {
+    copy( signature.begin(), signature.end(), back_inserter( sigLis ) );
+}
+
+int Node::sizeList() {
+    return sigLis.size();
+}
+
+list<int> Node::getList() {
+    return sigLis;
+}
+
+// Adds a number to the beginning of signature.
+void Node::pushListFront(int v) {
+    sigLis.push_front(v);
+}
+
+// Adds a number to the ending of signature.
+void Node::pushListBack(int v) {
+    sigLis.push_back(v);
+}
+
+// Removes the first element from a signature.
+void Node::popListFront() {
+    sigLis.pop_front();
+}
+
+string Node::listToString() {
+    std::ostringstream out;
+    
+    if (!sigLis.empty()) {
+        // Convert all but the last element to avoid a trailing ","
+        copy(sigLis.begin(), --sigLis.end(), ostream_iterator<int>(out, ","));
+
+        // Now add the last element with no delimiter
+        out << sigLis.back();
+    }
+    
+    return out.str();
 }

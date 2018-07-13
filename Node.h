@@ -6,6 +6,8 @@
  */
 #ifndef NODE_H
 #define NODE_H
+#include <climits>
+#include <list>
 #include "Point.h"
 
 using namespace std;
@@ -16,6 +18,9 @@ class Node {
 public:
     Node();
     Node(Point p);
+    
+    Node(int c, int n[], int s[], Point p);
+    
     //Node(const Node& orig);
     //Node(Node const &) = delete;
     //void operator=(Node) = delete;
@@ -37,7 +42,7 @@ public:
     void setColor(int c);
     int getColor();
     
-    string retreiveSig();
+    string vecToString();
     
     vector<int> getSig();
     vector<int> resize(int l);
@@ -46,11 +51,24 @@ public:
     void pushSig(int v);
     
     int size();
+    
+    void vecToList();
+    void pushListFront(int v);
+    void pushListBack(int v);
+    void popListFront();
+    
+    int sizeList();
+    list<int> getList();
+    
+    string listToString();
 
 private:
 
     vector<int> signature;
-    vector<int> neighbors;
+    vector<int> neighbors;  
+    
+    list<int> sigLis;
+    
     Point p;
     int color;
     int dist;
