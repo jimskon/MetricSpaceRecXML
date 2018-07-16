@@ -17,14 +17,9 @@ static int trans2[] = {0, 1, 2, -2, 3};
 class Node {
 public:
     Node();
-    Node(Point p);
     
-    Node(int c, int n[], int s[], Point p);
+    Node(int c, list<int> s, Point p);
     
-    //Node(const Node& orig);
-    //Node(Node const &) = delete;
-    //void operator=(Node) = delete;
-
     virtual ~Node();
 
     void display();
@@ -41,24 +36,17 @@ public:
     
     void setColor(int c);
     int getColor();
-    
-    string vecToString();
-    
-    vector<int> getSig();
+        
     vector<int> resize(int l);
     
-    void copySig(vector<int> v);
-    void pushSig(int v);
+    int sizeSig();
+    list<int> getSig();
     
-    int size();
-    
-    void vecToList();
-    void pushListFront(int v);
-    void pushListBack(int v);
+    void pushSigFront(int v);
+    void pushSigBack(int v);
+    void pushSigBack2(int x, int y);
     void popListFront();
-    
-    int sizeList();
-    list<int> getList();
+    void copySig(list<int> v);
     
     string listToString();
 

@@ -24,15 +24,18 @@ int Graph::add(Node *n) {
     return i;
 }
 
+// Indicates where in the graph the user is looking.
 Node *Graph::at(int i) {
     return graph.at(i);
 }
 
+// Connects two nodes and returns their indexes.
 void Graph::addLink(int i, int link) {
     graph.at(i)->next(link);
     graph.at(link)->next(i);
 }
 
+// Returns the size of the graph.
 int Graph::size() {
     return graph.size();
 }
@@ -47,16 +50,15 @@ void Graph::display() {
 }
 
 void Graph::xmlNodes() {
-    int k =1;
+    int k = 1;
     int length = graph.size();
     //cout << "<nodes>";
     for (int i = 0; i < length; i++) {
         //cout << "<n>";
+        
         cout << "No. " << k << " | "; 
         
-        graph.at(i)->xmlNodeXY();
-        
-        cout << " | ";
+        /*graph.at(i)->xmlNodeXY();
         
         vector<int> neighbors = graph.at(i)->getNeighbors();
         int l = neighbors.size();
@@ -66,23 +68,17 @@ void Graph::xmlNodes() {
             cout << "</l>";
         }
         
-        //cout << " | ";
-        
-        //cout << "<c>";
-        //int color = graph.at(i)->getColor();
+        cout << "<c>";
+        int color = graph.at(i)->getColor();
         cout << color;
-        //cout << "</c>";
+        cout << "</c>";
         
-        cout << " | ";
-        
-        //cout << "<s>";
-        //string signature = graph.at(i)->vecToString();
+        cout << "<s>";*/
         string signature = graph.at(i)->listToString();
-        //cout << signature;
+        cout << signature << endl;
         //cout << "</s>";
         //cout << "</n>";
                 
-        cout << signature << endl;
         k++;
         
     }

@@ -18,29 +18,20 @@
 #include <limits>
 #include "Node.h"
 
-
 Node::Node() {
     color = 0;
 }
 
-Node::Node(Point p) {
-    color = 0;
-    this->p = p;
-}
-
-Node::Node(int c, int n[], int s[], Point p) {
+Node::Node(int c, list<int> s, Point p) {
     color = c;
-    int i=0;
     
-    while (n[i] < INT_MAX) {
-        neighbors.push_back(n[i++]);
-    }
+    //int i = 0;
+    //while (s[i] < INT_MAX) {
+    //    sigLis.push_back(s[i++]);
+    //}
     
-    i = 0;
-    while (s[i] < INT_MAX) {
-        sigLis.push_back(s[i++]);
-        //signature.push_back(s[i++]);
-    }
+    this->sigLis = s;
+    //copy(s.begin(), s.end(), back_inserter(sigLis));
         
     this->p = p;
 }
@@ -68,10 +59,12 @@ void Node::next(int i) {
     this->neighbors.push_back(i);
 }
 
+// Returns the (x , y) coordinates.
 Point Node::getPoint() {
     return p;
 }
 
+// Displays the (x , y) coordinates.
 void Node::xmlNodeXY() {
     cout << "<x>" << p.GetX() << "</x><y>" << p.GetY() << "</y>";
 }
@@ -100,73 +93,46 @@ int Node::getColor() {
     return color;
 }
 
-// Converts a vector into a string.
-string Node::vecToString() {
-    std::ostringstream vss;
-    
-    if (!signature.empty()) {
-        // Convert all but the last element to avoid a trailing ","
-        std::copy(signature.begin(), signature.end()-1, std::ostream_iterator<int>(vss, ","));
-
-        // Now add the last element with no delimiter
-        vss << signature.back();
-    }
-    
-    return vss.str();
-}
-
-// Returns the signature of a node.
-vector<int> Node::getSig() {
-    return signature;
-}
-
-// Pass in the level that you are looking at and return the vector but with  
+// Pass in the level and return the vector but with  
 // a new restricted size.
 vector<int> Node::resize(int l) {
     signature.resize(l);
     return signature;
 }
 
-// Adds a number to a signature of a node.
-void Node::pushSig(int v) {
-    signature.push_back(v);
-}
-
-// Copy the signature of a vector onto a node.
-void Node::copySig(vector<int> v) {
-    this->signature = v; 
-}
-
 // Return the size of the signature.
-int Node::size() {
-    return signature.size();
-}
-
-void Node::vecToList() {
-    copy( signature.begin(), signature.end(), back_inserter( sigLis ) );
-}
-
-int Node::sizeList() {
+int Node::sizeSig() {
     return sigLis.size();
 }
 
-list<int> Node::getList() {
+list<int> Node::getSig() {
     return sigLis;
 }
 
-// Adds a number to the beginning of signature.
-void Node::pushListFront(int v) {
+//Adds a number to the beginning of the signature.
+void Node::pushSigFront(int v) {
     sigLis.push_front(v);
 }
 
 // Adds a number to the ending of signature.
-void Node::pushListBack(int v) {
+void Node::pushSigBack(int v) {
     sigLis.push_back(v);
+}
+
+// Adds two numbers to the ending of signature.
+void Node::pushSigBack2(int x, int y) {
+    sigLis.push_back(x);
+    sigLis.push_back(y);
 }
 
 // Removes the first element from a signature.
 void Node::popListFront() {
     sigLis.pop_front();
+}
+
+// Copy the signature of a list onto another list.
+void Node::copySig(list<int> v) {
+    this->sigLis = v; 
 }
 
 string Node::listToString() {
