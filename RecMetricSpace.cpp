@@ -179,19 +179,21 @@ void buildLevel3(Graph *g, bool p, int s, int e) {
     list<int> tempS = g->at(s)->getSig();
     list<int> tempE = g->at(e)->getSig();
     
+    // Assigns (-1) to the point in the signature that should be going down. 
+    // The conversion from a list to a vector back to a list is because it was
+    // easier to look at a particular element of a signature with the vector
+    // .at() command than iterating through a list.
     vector<int> x,y;
     copy(tempS.begin(), tempS.end(), back_inserter(x));
     copy(tempE.begin(), tempE.end(), back_inserter(y));
     
-    if (x.size() == y.size()) {
-        int j = 0;
-        while (j < x.size()) {
-            if ( (y.at(j) < 0) && (x.at(j) > 0) ) {
-                x.at(j) = -1;
-                break;
-            }
-            j++;
+    int j = 0;
+    while (j < x.size()) {
+        if ( (y.at(j) < 0) && (x.at(j) > 0) ) {
+            x.at(j) = -1;
+            break;
         }
+        j++;
     }
     
     list<int> tp;
@@ -433,42 +435,83 @@ void buildLevel3(Graph *g, bool p, int s, int e) {
         g->addLink(B27, B29);
         g->addLink(B28, B29);
         g->addLink(B29, e);
-        
+
     }
-    
-    //g->at(s)->pushSigBack2(0,0);
-    //g->at(e)->pushSigBack2(0,0);
 
 }
 
 // Goes through and creates the other parts of the fractal until the level is 3.
 // once the level is 3, the graph, boolean value, and the 2 indexes at that
-// relative area are then sent to buildLevel3.
-void buildGraph(Graph *g, bool p, int s, int e, int level) {
+// relative area are then sent to buildLevel3().
+void buildGraph(Graph *g, bool p, int s, int e, int level, int l) {
     
+    // Once the level is three, the inbetween nodes are created and added to the
+    // graph. Note that a level three piece is acting as the base case for the
+    // construction of the fractal.
     if (level == 3) {
         buildLevel3(g, p, s, e);
         return;
     } 
+            
+    list<int> tempS = g->at(s)->getSig();
+    list<int> tempE = g->at(e)->getSig();
     
-    list<int> temp = g->at(s)->getSig();
+    while(tempS.size() >= l) {
+        tempS.pop_back();
+    }
     
-    int a = g->add(new Node(31, temp, computeP2(g->at(s)->getPoint(), g->at(e)->getPoint())));
-    int b = g->add(new Node(31, temp, computeP3(g->at(s)->getPoint(), g->at(e)->getPoint())));
-    int c = g->add(new Node(31, temp, computeP4(g->at(s)->getPoint(), g->at(e)->getPoint())));
-    int d = g->add(new Node(31, temp, computeP5(g->at(s)->getPoint(), g->at(e)->getPoint()))); 
+    // Assigns (-1) to the point in the signature that should be going down. 
+    // The conversion from a list to a vector back to a list is because it was
+    // easier to look at a particular element of a signature with the vector
+    // .at() command than iterating through a list.
+    vector<int> x,y;
+    copy(tempS.begin(), tempS.end(), back_inserter(x));
+    copy(tempE.begin(), tempE.end(), back_inserter(y));
     
+    int j = 0;
+    while (j < x.size()) {
+        if ( (y.at(j) < 0) && (x.at(j) > 0) ) {
+            x.at(j) = -1;
+            break;
+        }
+        j++;
+    }
+    
+    list<int> tp;
+    copy(x.begin(), x.end(), back_inserter(tp));
+    
+    // Pushes 0 onto the recorded signature of that particular start index.
+    if (g->at(s)->sizeSig() < l) {
+        g->at(s)->pushSigBack(0);
+    }
+    
+    // Pushes 0 onto the recorded signature of that particular end index.
+    if (g->at(e)->sizeSig() < l) {
+        g->at(e)->pushSigBack(0);
+    }
+    
+    // Creates the four new nodes that are between the start and end indexes
+    // so that the fractal can be created. The order of the inputs to
+    // new Node are color, temporary signature, and the (x , y) coordinates.
+    int a = g->add(new Node(31, tp, computeP2(g->at(s)->getPoint(), g->at(e)->getPoint())));
+    int b = g->add(new Node(31, tp, computeP3(g->at(s)->getPoint(), g->at(e)->getPoint())));
+    int c = g->add(new Node(31, tp, computeP4(g->at(s)->getPoint(), g->at(e)->getPoint())));
+    int d = g->add(new Node(31, tp, computeP5(g->at(s)->getPoint(), g->at(e)->getPoint()))); 
+        
+    // Pushes a value onto the recorded signature of each node
     g->at(a)->pushSigBack(1);
     g->at(b)->pushSigBack(2);
     g->at(c)->pushSigBack(-2);
     g->at(d)->pushSigBack(3);
 
-    buildGraph(g, !p, s, a, level -1);
-    buildGraph(g, !p, a, b, level -1);
-    buildGraph(g, p, a, c, level -1);
-    buildGraph(g, !p, b, d, level -1);
-    buildGraph(g, p, c, d, level -1);
-    buildGraph(g, !p, d, e, level -1);
+    // Repeats the process for the rest of the fractal until everything is 
+    // fully accounted for.
+    buildGraph(g, !p, s, a, level -1, l+1);
+    buildGraph(g, !p, a, b, level -1, l+1);
+    buildGraph(g, p, a, c, level -1, l+1);
+    buildGraph(g, !p, b, d, level -1, l+1);
+    buildGraph(g, p, c, d, level -1, l+1);
+    buildGraph(g, !p, d, e, level -1, l+1);
 }
 
 // Accepts the graph and the level as the parameters. Then, checks to see 
@@ -480,19 +523,20 @@ void buildInitialGraph(Graph *g, int level) {
     int s, e;
     
     // The initial signatures.
-    list<int> st1, st2;
-    st1.push_back(0);
-    st2.push_back(1);
+    list<int> st1 = {0}, st2 = {1};
     
     // The starting (x , y) coordinates of the first and last node.
     Point pStart(0, 250);
     Point pEnd(1000, 250);
     
+    // In order to create a graph there has to be a base case and level 1 is
+    // the base case
     if (level < 1) {
         cout << "The level must be at least 1. " << endl;
         return;
     }
     
+    // The simplest the fractal can be.
     if (level == 1) {
         s = g->add(new Node(1, st1, pStart));
         e = g->add(new Node(2, st2, pEnd)); 
@@ -500,17 +544,25 @@ void buildInitialGraph(Graph *g, int level) {
         return;
     }
     
+    // The generic shape that the fractal will follow so long as the level is
+    // 2 or greater.
     if (level == 2) {
         s = g->add(new Node(1, st1, pStart));
         e = g->add(new Node(2, st2, pEnd));
         
+        // Takes the signature of the starting node and copies it into 
+        // a temporary list.
         list<int> temp = g->at(s)->getSig();
         
+        // The node color, temporary signature, and relative (x,y) coordinates
+        // are then sent to the graph which records the data to later be 
+        // displayed to the user. 
         int a = g->add(new Node(3, temp, computeP2(g->at(s)->getPoint(), g->at(e)->getPoint())));
         int b = g->add(new Node(4, temp, computeP3(g->at(s)->getPoint(), g->at(e)->getPoint())));
         int c = g->add(new Node(5, temp, computeP4(g->at(s)->getPoint(), g->at(e)->getPoint())));
         int d = g->add(new Node(6, temp, computeP5(g->at(s)->getPoint(), g->at(e)->getPoint())));
         
+        // Pushes a value onto the recorded signature of each node 
         g->at(s)->pushSigBack(0);
         g->at(a)->pushSigBack(1);
         g->at(b)->pushSigBack(2);
@@ -518,6 +570,7 @@ void buildInitialGraph(Graph *g, int level) {
         g->at(d)->pushSigBack(3);
         g->at(e)->pushSigBack(0);
         
+        // Links each node in the graph
         g->addLink(s, a);
         g->addLink(a, b);
         g->addLink(a, c);
@@ -531,17 +584,36 @@ void buildInitialGraph(Graph *g, int level) {
     if (level > 2) {
         s = g->add(new Node(31, st1, pStart));
         e = g->add(new Node(31, st2, pEnd));
-    
+        
+        // Creates the rest of the nodes inbetween the start and ending node of
+        // the graph
         bool p = true;
-        buildGraph(g, p, s, e, level); 
+        buildGraph(g, p, s, e, level, 2); 
+        
+        // Adds 0 to the end of signatures for those that do not already have
+        // enough zeros. The maximum and minimum length of the signature must
+        // be the level and this code secures that for the user.
+        int j=0, k=0;
+        while (j < level) {
+            for (int i=0; i < g->size(); i++) {
+                int j=0;
+                if (g->at(i)->getSig().size() < level) {
+                    g->at(i)->pushSigBack(0);
+                }
+            }
+            j++;
+        }
         
         return;
     }
-    
 }
 
-
-// Create 
+// The user inputs the amount of levels that they want to view. A graph and 
+// the amount of levels are then sent to buildGraph(). Once all of the graph is 
+// generated, g->xmlNodes() will send the output of the (x , y) coordinates,
+// the coordinates of each of the neighbors, the color, and the signature of
+// each node in the graph in XML formatting. After the output is generated,
+// the program is then complete.
 int main() {
     Graph *g = new Graph();
     int level;

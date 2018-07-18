@@ -42,11 +42,8 @@ public:
     int sizeSig();
     list<int> getSig();
     
-    void pushSigFront(int v);
     void pushSigBack(int v);
     void pushSigBack2(int x, int y);
-    void popListFront();
-    void copySig(list<int> v);
     
     string listToString();
 

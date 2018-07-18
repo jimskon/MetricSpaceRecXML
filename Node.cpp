@@ -25,13 +25,7 @@ Node::Node() {
 Node::Node(int c, list<int> s, Point p) {
     color = c;
     
-    //int i = 0;
-    //while (s[i] < INT_MAX) {
-    //    sigLis.push_back(s[i++]);
-    //}
-    
     this->sigLis = s;
-    //copy(s.begin(), s.end(), back_inserter(sigLis));
         
     this->p = p;
 }
@@ -105,13 +99,9 @@ int Node::sizeSig() {
     return sigLis.size();
 }
 
+// Returns the signature.
 list<int> Node::getSig() {
     return sigLis;
-}
-
-//Adds a number to the beginning of the signature.
-void Node::pushSigFront(int v) {
-    sigLis.push_front(v);
 }
 
 // Adds a number to the ending of signature.
@@ -125,16 +115,7 @@ void Node::pushSigBack2(int x, int y) {
     sigLis.push_back(y);
 }
 
-// Removes the first element from a signature.
-void Node::popListFront() {
-    sigLis.pop_front();
-}
-
-// Copy the signature of a list onto another list.
-void Node::copySig(list<int> v) {
-    this->sigLis = v; 
-}
-
+// Converts a list<int> into a string.
 string Node::listToString() {
     std::ostringstream out;
     
