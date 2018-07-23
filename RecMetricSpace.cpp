@@ -15,15 +15,9 @@
 
 using namespace std;
 static int DIVIDEFACTOR = 4;
-int maxColorsUsed=0;
 
-int max(int a, int b) {
-    if (a > b)
-        return a;
-    else
-        return b;
-}
-
+// Passes the beginning and end of the six piece section and calculates the 
+// (x , y) coordinates relative to the beginning and end. This applies to P2-5.
 Point computeP2(Point pStart, Point pEnd) {
     int x = (3 * pStart.GetX() + pEnd.GetX()) / DIVIDEFACTOR;
     int y = (3 * pStart.GetY() + pEnd.GetY()) / DIVIDEFACTOR;
@@ -50,112 +44,6 @@ Point computeP5(Point pStart, Point pEnd) {
     int y = (pStart.GetY() + 3 * pEnd.GetY()) / DIVIDEFACTOR;
     Point p(x, y);
     return p;
-}
-
-void clearDists(Graph *g) {
-    for (int i = 0; i < g->size(); i++) {
-        g->at(i)->clearDist();
-    }
-}
-
-// Recursively set the distances of all nodes adjacent to this node
-// as long as distance <= MAX
-void getNodesInRange(Graph *g, set<int> &inRange, int index, int max) {
-    
-    int dist = g->at(index)->getDist(); // Distance of this node
-    
-    //cout << "Node: " << index << " Dist: " << dist << endl;
-    
-    if (dist < INT_MAX && dist > max) return; //  This is the base case for recursion - we have reached the max
-    
-    //cout << "Add: " << index << endl;
-    
-    inRange.insert(index);
-    
-    // we can go deeper, recurse on neighbors if they are farther away then our length + 1
-    
-    for (int i = 0; i < g->at(index)->getNeighbors().size(); i++) { // For each neighbor
-        int j = g->at(index)->getNeighbors().at(i); // Get the neighbors index
-        if (g->at(j)->getDist() > dist + 1) {
-            (g->at(j))->setDist(dist + 1);
-            getNodesInRange(g, inRange, j, max);
-        }
-    }
-}
-
-// Find all nodes within max range
-set<int> findNodesInRange(Graph *g, int startIndex, int max) {
-    set<int> ball; // Nodes in ball of max diameter
-    clearDists(g); // reset distances
-    g->at(startIndex)->setDist(0);
-    getNodesInRange(g, ball, startIndex, max);
-    return ball;
-}
-
-// Color center of balls with a given ballsize
-void colorBallsWithBallSize(Graph *g, int ballSize) {
-    int maxDist = 10;
-    
-    /*do {
-        cout << "Node to check[0.." << g->size() - 1 << "] (-1 to end): ";
-        cin >> node;
-    } while (node < 0 && node >= g->size()); */
-    //int maxBall = 0;
-    
-    for (int i = 0; i < g->size(); i++) {
-        set<int> ball = findNodesInRange(g, i, maxDist);
-        //maxBall = max(maxBall, ball.size());
-        if (ball.size() >= ballSize) {
-            g->at(i)->setColor(1);
-            //cout << i << " ";
-        }
-    }
-    
-    //cout << "Max ball size: " << maxBall << endl;
-}
-
-// Fill set with maxColors colors (ints)
-void initColors(set<int> &colors, int maxColors) {
-    for (int i = 1; i <= maxColors; i++) {
-        colors.insert(i);
-    }
-}
-
-void removeUsedColors(Graph *g, set<int> &colors, set<int> ball) {
-    set<int>::iterator it;
-    for (it = ball.begin(); it != ball.end(); ++it) {
-        int index = *it;
-        int color = g->at(index)->getColor();
-        if (color > 0) {
-            colors.erase(color);
-        }
-    } 
-}
-
-void colorAllNodes(Graph *g, int maxDist, int level) {
-    const int MaxColors = 65;
-    set<int> colors; //set of currently available colors
-    set<int>::iterator it;
-    
-            for (int i = 0; i < g->size(); i++) {
-            set<int> ball = findNodesInRange(g, i, maxDist);
-
-            initColors(colors, MaxColors);
-            removeUsedColors(g, colors, ball);
-            it=colors.begin();
-        
-            g->at(i)->setColor(*it);
-            maxColorsUsed = (maxColorsUsed>*it) ? maxColorsUsed : *it;
-        }
-}
-
-void displayBall(Graph *g, set<int> ball) {
-    cout << "Size of ball: " << ball.size() << endl;
-    set<int>::iterator it;
-    for (it = ball.begin(); it != ball.end(); ++it) {
-        cout << ' ' << *it;
-    }
-    cout << '\n';
 }
 
 // The variable abbreviations stand for -
@@ -443,6 +331,11 @@ void buildLevel3(Graph *g, bool p, int s, int e) {
 // Goes through and creates the other parts of the fractal until the level is 3.
 // once the level is 3, the graph, boolean value, and the 2 indexes at that
 // relative area are then sent to buildLevel3().
+// - - - 
+// l stands for the signature length as is what we check to see if the signature
+// at the beginning and end pieces is correct. It doesn't fully add all of the 
+// zeroes since we don't bottom out in this code, but that is why we have 
+// a for loop within a while loop to add in the remaining zeroes to the signature.
 void buildGraph(Graph *g, bool p, int s, int e, int level, int l) {
     
     // Once the level is three, the inbetween nodes are created and added to the
@@ -615,16 +508,24 @@ void buildInitialGraph(Graph *g, int level) {
 // each node in the graph in XML formatting. After the output is generated,
 // the program is then complete.
 int main() {
+    // This is the only graph to be utilized for the program, and it will
+    // be sent to every function.
     Graph *g = new Graph();
     int level;
 
     cout << "How many levels? ";
     cin >> level;
     
+    // Gets the nodes a rolling 
     buildInitialGraph(g, level);
     
+    // Displays the node information assuming that the level is greater than 1.
     if (level >= 1) {
-       g->xmlNodes(); 
+        //XML format
+        //g->xmlNodes();
+        
+        // CSV format
+        g->CSVData();
     }
         
     return 0;

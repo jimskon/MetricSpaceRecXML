@@ -1,10 +1,3 @@
-/* 
- * File:   Graph.h
- * Author: skonjp
- *
- * Created on August 30, 2017, 12:13 AM
- */
-
 #ifndef GRAPH_H
 #define GRAPH_H
 #include "Node.h"
@@ -16,10 +9,13 @@ public:
 
     int add(Node *n);
     void addLink(int i, int link);
-    int size();
+    
     Node *at(int i);
-    void display();
-    void xmlNodes();    
+    
+    int size();
+    
+    void xmlNodes();
+    void CSVData();
 private:
     vector<Node*> graph;
 };

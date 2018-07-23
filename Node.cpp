@@ -1,10 +1,3 @@
-/* 
- * File:   Node.cpp
- * Author: skonjp
- * 
- * Created on August 21, 2017, 10:33 AM
- */
-
 #include <cstdlib>
 #include <vector>
 #include <string>
@@ -18,10 +11,14 @@
 #include <limits>
 #include "Node.h"
 
-Node::Node() {
-    color = 0;
-}
-
+// This is the default constructor for generating a new node. Every single node 
+// that is generated will be run through this constructor to initialize the 
+// following variables.
+// - - -
+// Each parameter stands for - 
+// c = color
+// s = signature
+// p = (x , y) coordinates
 Node::Node(int c, list<int> s, Point p) {
     color = c;
     
@@ -30,25 +27,7 @@ Node::Node(int c, list<int> s, Point p) {
     this->p = p;
 }
 
-Node::~Node() {
-}
-
-void Node::display() {
-
-    cout << " (" << p.GetX() << "," << p.GetY() << ") ";
-    cout << "Color: " << color << " ";
-
-    if (neighbors.size() > 0) {
-        cout << "Next:";
-    }
-    int i = 0;
-    while (i < neighbors.size()) {
-        cout << neighbors.at(i) << ":";
-        i++;
-    }
-
-}
-
+// Records the neighbors of a node by pushing them back into a vector<int>
 void Node::next(int i) {
     this->neighbors.push_back(i);
 }
@@ -63,35 +42,15 @@ void Node::xmlNodeXY() {
     cout << "<x>" << p.GetX() << "</x><y>" << p.GetY() << "</y>";
 }
 
+// Returns the neighbors of a node. (i.e. the very first node only has one
+// neighbor, hence the node to the immediate right is sent back to the user.)
 vector<int> Node::getNeighbors() {
     return neighbors;
 }
 
-void Node::clearDist() {
-    dist = INT_MAX;
-}
-
-void Node::setDist(int d) {
-    dist = d;
-}
-
-int Node::getDist() {
-    return dist;
-}
-
-void Node::setColor(int c) {
-    color = c;
-}
-
+// Returns the color (int) of the node.
 int Node::getColor() {
     return color;
-}
-
-// Pass in the level and return the vector but with  
-// a new restricted size.
-vector<int> Node::resize(int l) {
-    signature.resize(l);
-    return signature;
 }
 
 // Return the size of the signature.

@@ -18,15 +18,11 @@ Graph::Graph() {
 Graph::Graph(const Graph& orig) {
 }
 
+// Adds a new node to the graph.
 int Graph::add(Node *n) {
     int i = graph.size();
     graph.push_back(n);
     return i;
-}
-
-// Indicates where in the graph the user is looking.
-Node *Graph::at(int i) {
-    return graph.at(i);
 }
 
 // Connects two nodes and returns their indexes.
@@ -35,18 +31,14 @@ void Graph::addLink(int i, int link) {
     graph.at(link)->next(i);
 }
 
+// Indicates where in the graph the user is looking.
+Node *Graph::at(int i) {
+    return graph.at(i);
+}
+
 // Returns the size of the graph.
 int Graph::size() {
     return graph.size();
-}
-
-void Graph::display() {
-    cout << "Nodes: " << graph.size() << endl;
-    for (int i = 0; i < graph.size(); i++) {
-        cout << "[" << i << "] ";
-        graph.at(i)->display();
-        cout << endl;
-    }
 }
 
 void Graph::xmlNodes() {
@@ -84,4 +76,36 @@ void Graph::xmlNodes() {
                 
     }
     cout << "</nodes>";
+}
+
+// CSV = Comma Separated Values
+// Output node data in CSV form:
+// x:y:color:neighbors(csv),signature(csv)
+void Graph::CSVData() {
+    int length = graph.size();
+    for (int i = 0; i < length; i++) {
+          
+        // Gets the (x , y) coordinates of each node.
+        Point p=graph.at(i)->getPoint();
+        cout << p.GetX() << ":" << p.GetY() << ":";
+       
+        // Displays the color of each node.      
+        int color = graph.at(i)->getColor();
+        cout << color << ":";
+          
+        // Gets the (x , y) coordinates of the nodes surrounding the previously
+        // mentioned node.
+        vector<int> neighbors = graph.at(i)->getNeighbors();
+        int l = neighbors.size();
+        for (int i=0; i<l; i++){
+            cout  << graph.at(neighbors.at(i))->getPoint().GetX() << "," << graph.at(neighbors.at(i))->getPoint().GetY();
+            if (i+1<l) cout << ",";
+        }
+        cout << ":";
+                
+        // Displays the signature of each node.
+        string signature = graph.at(i)->listToString();
+        cout << signature;
+        cout << endl;    
+    }
 }
